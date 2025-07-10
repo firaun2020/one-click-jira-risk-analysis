@@ -1,43 +1,62 @@
-Risk-AI for Jira (Forge App)
-Risk-AI is a Forge-powered Jira app that automates risk assessment for technical change requests by leveraging OpenAI's GPT-4-turbo model. It integrates directly into Jira issues and populates a custom field with an AI-generated risk analysis, ensuring faster, consistent, and professional risk evaluations.
+# Risk-AI for Jira (Forge App)
 
-Features
-One-click AI-based risk analysis from within Jira
+**Risk-AI** is a Forge-powered Jira app that automates risk assessments for technical Change Requests using OpenAI's GPT-4-turbo model. It reads issue data and generates structured risk insights directly into a custom field.
 
-Writes formatted output directly into a custom field
+---
 
-Prevents duplicate assessments unless cleared
+## ✦ Features
 
-Easy to install and use within any Jira project
+- One-click AI-based risk analysis from within Jira issues
+- Automatically writes output into a custom field
+- Prevents re-analysis if an entry already exists
+- Designed for structured, professional output that non-technical stakeholders can read
 
-Prerequisites
-Create a Custom Field in Jira:
+---
 
-Name: Risk-Analysis (or your preferred name)
+## How It Works
+- App fetches summary, description, and Risk-Analysis field.
+- If the field is already populated, it aborts.
+- If not, it sends data to GPT-4-turbo with a structured prompt.
+- AI returns 3–6 risk bullet points.
+- Output is written in ADF format to Jira, including a timestamp like:
 
-Type: Paragraph (multi-line)
+```bash
+Generated on: 27-June-2025, 15:00
+```
 
-Note the Custom Field ID (e.g., customfield_10554).
 
-Configure Field Context:
+---
 
-Ensure the custom field is available in the desired project(s).
+## 🔧 Prerequisites
 
-Add it to the relevant screen(s) such as “Edit” or “View” for the Change Request issue type.
+### 1. Create a Custom Field
 
-Make it visible to all users by default (under Field Configuration → Screens and Context).
+- Go to: **Jira Settings → Issues → Custom Fields**
+- Create a new field of type: **Paragraph (multi-line text)**
+- Name it: `Risk-Analysis`
+- After creating, note the **field ID** (e.g., `customfield_10554`)
 
-Environment Variable (Secrets):
+### 2. Add the Field to Screens
 
-Store your OpenAI API Key securely using Forge secrets:
+- Add `Risk-Analysis` to all relevant screens:
+  - Create Screen
+  - Edit Screen
+  - View Screen
+- Apply it to the **issue type** (e.g., `Change`) and relevant **project(s)**
+- Ensure your team has permission to view this field
 
-bash
-Copy
-Edit
-forge variables:set --encrypt OPENAI_API_KEY=<your-openai-api-key>
-Permissions Required in Manifest:
+### 3. Set Environment Variable (OpenAI API Key)
 
-yaml
+Store your OpenAI API key using Forge CLI:
+
+```bash
+forge variables:set --encrypt OPENAI_API_KEY=your-key-here
+```
+
+### 4. Manifest Configuration
+Ensure your manifest.yml includes the following:
+
+```yaml
 Copy
 Edit
 permissions:
@@ -48,40 +67,14 @@ permissions:
     fetch:
       backend:
         - api.openai.com
-Deployment & Installation:
+```
 
-Deploy to development or production:
 
-bash
-Copy
-Edit
+
+### 5. Deployment Steps
+Deploy to Development
+```bash
 forge deploy
 forge install --upgrade
-The app works in development mode only for the app author unless installed on a production site.
-
-How It Works
-On clicking the "Run Risk Analysis" button, the app:
-
-Fetches the summary and description from the current Jira issue.
-
-Sends a prompt to OpenAI's GPT model.
-
-Receives a structured risk analysis.
-
-Writes the response back into the Risk-Analysis field using Jira's ADF formatting.
-
-If a response already exists in the field, the app blocks re-analysis and informs the user.
-
-Frontend Behavior
-Button shows a loading state while the analysis is in progress.
-
-A status message is shown once complete (success, info, or error).
-
-Risk content is not re-rendered in the panel—it is stored in the issue's custom field.
-
-Notes
-Only one risk analysis is allowed per issue to avoid duplication.
-
-Works best for well-written summaries and descriptions.
-
-Formatting uses numbered bullets for risks and includes a timestamp.
+```
+⚠️ Installing to development limits access to the app developer only.
